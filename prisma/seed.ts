@@ -6,6 +6,15 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Starting Dayavi database seed...");
 
+  const userCount = await prisma.user.count();
+  const force = process.argv.includes("--force") || process.env.FORCE_SEED === "true";
+
+  if (userCount > 0 && !force) {
+    console.log(`ℹ️ Database already contains ${userCount} users. Skipping seed.`);
+    console.log("   To force wipe and re-seed, run: npm run db:seed:force or set FORCE_SEED=true.");
+    return;
+  }
+
   // Clean existing seed data in correct cascade order
   await prisma.activity.deleteMany();
   await prisma.notification.deleteMany();
