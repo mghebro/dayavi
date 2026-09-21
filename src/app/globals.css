@@ -1,26 +1,84 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #FDFBF7;
+    --foreground: #18181B;
+    --surface-content: #FFFFFF;
+    --surface-secondary: #F5F2EB;
+    --ink-border: #18181B;
+    
+    --coral: #FF6B4A;
+    --coral-hover: #FA5530;
+    --lavender: #E0D8FF;
+    --lavender-dark: #8B5CF6;
+    --butter: #FEF08A;
+    --butter-dark: #FACC15;
+    --sage: #D1FAE5;
+    --sage-dark: #10B981;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ----------------------------------------------------
+ * TACTILE SOFT NEO-BRUTALIST SHADOWS & INTERACTIONS
+ * ---------------------------------------------------- */
+
+.shadow-retro-sm {
+  box-shadow: 1.5px 1.5px 0px 0px #18181B;
+}
+
+.shadow-retro {
+  box-shadow: 2px 2px 0px 0px #18181B;
+}
+
+.shadow-retro-md {
+  box-shadow: 3px 3px 0px 0px #18181B;
+}
+
+.shadow-retro-lg {
+  box-shadow: 5px 5px 0px 0px #18181B;
+}
+
+.shadow-retro-coral {
+  box-shadow: 3px 3px 0px 0px #FF6B4A;
+}
+
+.btn-retro {
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-retro:hover {
+  transform: translate(-1px, -1px);
+}
+
+.btn-retro:active {
+  transform: translate(2px, 2px);
+  box-shadow: none !important;
+}
+
+/* Custom discreet scrollbars for dense productivity */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5F2EB;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4D4D8;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A1A1AA;
 }
