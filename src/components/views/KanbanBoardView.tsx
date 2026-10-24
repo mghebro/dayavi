@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   DndContext,
@@ -35,15 +35,13 @@ import { toast } from "sonner";
 import {
   Plus,
   MoreHorizontal,
-  Clock,
   CheckSquare,
-  AlertCircle,
   Calendar,
-  Layers,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { TaskPriority } from "@prisma/client";
 import { TaskDetailDrawer, TaskDetailData } from "@/components/tasks/TaskDetailDrawer";
+import { useTranslation } from "@/lib/i18n/context";
 
 export interface KanbanTask {
   id: string;
@@ -99,6 +97,7 @@ function TaskCard({
   columns: KanbanColumnData[];
   onOpenDetail: (taskId: string) => void;
 }) {
+  const { t } = useTranslation();
   const {
     attributes,
     listeners,
@@ -125,6 +124,8 @@ function TaskCard({
 
   const isBlocked = task.blockedBy && task.blockedBy.length > 0;
 
+  const priorityLabel = t.priorities[task.priority] || task.priority;
+
   return (
     <div
       ref={setNodeRef}
@@ -132,8 +133,8 @@ function TaskCard({
       {...attributes}
       {...listeners}
       onClick={() => onOpenDetail(task.id)}
-      className={`group relative p-3.5 rounded-xl border-2 border-[#18181B] bg-white shadow-retro-sm hover:shadow-retro hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all cursor-grab active:cursor-grabbing select-none ${
-        isDragging ? "opacity-30 border-dashed" : ""
+      className={`group relative p-3.5 rounded-xl border-2 border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#18181D] shadow-retro-sm hover:shadow-retro hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all cursor-grab active:cursor-grabbing select-none ${
+        isDragging ? "opacity-30 border-dashed border-[#FF6B4A]" : ""
       }`}
     >
       {/* Top badges: priority, blocked indicator */}
@@ -152,12 +153,12 @@ function TaskCard({
               }
               size="sm"
             >
-              {task.priority}
+              {priorityLabel}
             </Badge>
           )}
 
           {isBlocked && (
-            <span className="text-[10px] font-black px-1.5 py-0.2 rounded bg-[#FEE2E2] border border-[#EF4444] text-[#DC2626]">
+            <span className="text-[10px] font-black px-1.5 py-0.2 rounded bg-[#FEE2E2] dark:bg-[#3D1414] border border-[#EF4444] text-[#DC2626] dark:text-[#F87171]">
               BLOCKED
             </span>
           )}
@@ -168,15 +169,15 @@ function TaskCard({
           <DropdownMenuTrigger asChild>
             <button
               onClick={(e) => e.stopPropagation()}
-              className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-[#F5F2EB] text-[#71717A] hover:text-[#18181B] transition-opacity"
+              className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-[#F5F2EB] dark:hover:bg-[#202029] text-[#71717A] dark:text-[#A1A1AA] hover:text-[#18181B] dark:hover:text-[#F4F4F5] transition-opacity"
               title="Card options"
             >
               <MoreHorizontal className="w-3.5 h-3.5" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44">
-            <div className="text-[10px] font-black text-[#71717A] uppercase px-2 py-1">
-              Move to column:
+            <div className="text-[10px] font-black text-[#71717A] dark:text-[#A1A1AA] uppercase px-2 py-1">
+              {t.common.actions}:
             </div>
             {columns.map((c) => (
               <DropdownMenuItem
@@ -198,17 +199,17 @@ function TaskCard({
       </div>
 
       {/* Task Title */}
-      <h4 className="text-xs sm:text-sm font-black text-[#18181B] leading-snug mb-3">
+      <h4 className="text-xs sm:text-sm font-black text-[#18181B] dark:text-[#F4F4F5] leading-snug mb-3">
         {task.title}
       </h4>
 
       {/* Footer metadata: Due date, subtask progress, assignee */}
-      <div className="flex items-center justify-between text-[10px] font-bold text-[#71717A] pt-2 border-t border-[#E4E4E7]">
+      <div className="flex items-center justify-between text-[10px] font-bold text-[#71717A] dark:text-[#A1A1AA] pt-2 border-t border-[#E4E4E7] dark:border-[#2E2E38]">
         <div className="flex items-center gap-2">
           {task.dueDate && (
             <span
               className={`flex items-center gap-1 ${
-                isOverdue ? "text-[#DC2626] font-extrabold" : ""
+                isOverdue ? "text-[#DC2626] dark:text-[#F87171] font-extrabold" : ""
               }`}
             >
               <Calendar className="w-3 h-3" />
@@ -217,7 +218,7 @@ function TaskCard({
           )}
 
           {totalSubtasks > 0 && (
-            <span className="flex items-center gap-1 text-[#52525B]">
+            <span className="flex items-center gap-1 text-[#52525B] dark:text-[#A1A1AA]">
               <CheckSquare className="w-3 h-3" />
               <span>
                 {completedSubtasks}/{totalSubtasks}
@@ -227,9 +228,9 @@ function TaskCard({
         </div>
 
         {task.assignee ? (
-          <Avatar className="h-5 w-5 border border-[#18181B]">
+          <Avatar className="h-5 w-5 border border-[#18181B] dark:border-[#3F3F4A]">
             {task.assignee.image && <AvatarImage src={task.assignee.image} />}
-            <AvatarFallback className="text-[9px] font-black">
+            <AvatarFallback className="text-[9px] font-black bg-[#FF6B4A] text-white">
               {task.assignee.name?.[0] || "A"}
             </AvatarFallback>
           </Avatar>
@@ -256,6 +257,7 @@ function KanbanColumn({
   boardId: string;
   onOpenDetail: (taskId: string) => void;
 }) {
+  const { t } = useTranslation();
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -278,9 +280,9 @@ function KanbanColumn({
       });
 
       if (res.success && res.task) {
-        toast.success(`Task created in ${column.name}`, {
+        toast.success(t.tasks.taskCreatedSuccess, {
           action: {
-            label: "Undo",
+            label: t.common.undo,
             onClick: async () => {
               await deleteTaskAction(res.task.id);
             },
@@ -295,16 +297,16 @@ function KanbanColumn({
   };
 
   return (
-    <div className="w-72 sm:w-80 shrink-0 bg-[#F5F2EB] rounded-2xl border-2 border-[#18181B] flex flex-col max-h-[calc(100vh-14rem)] shadow-retro-sm">
+    <div className="w-72 sm:w-80 shrink-0 bg-[#F5F2EB] dark:bg-[#15151A] rounded-2xl border-2 border-[#18181B] dark:border-[#3F3F4A] flex flex-col max-h-[calc(100vh-14rem)] shadow-retro-sm">
       {/* Column Header */}
-      <div className="p-3.5 border-b-2 border-[#18181B] bg-[#FDFBF7] rounded-t-2xl flex items-center justify-between">
+      <div className="p-3.5 border-b-2 border-[#18181B] dark:border-[#3F3F4A] bg-[#FDFBF7] dark:bg-[#18181D] rounded-t-2xl flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-black text-[#18181B] uppercase tracking-wider">
+          <span className="text-xs font-black text-[#18181B] dark:text-[#F4F4F5] uppercase tracking-wider">
             {column.name}
           </span>
           <span
-            className={`text-[11px] font-extrabold px-2 py-0.2 rounded-full border border-[#18181B] ${
-              isWipExceeded ? "bg-[#EF4444] text-white" : "bg-white text-[#18181B]"
+            className={`text-[11px] font-extrabold px-2 py-0.2 rounded-full border border-[#18181B] dark:border-[#3F3F4A] ${
+              isWipExceeded ? "bg-[#EF4444] text-white" : "bg-white dark:bg-[#202029] text-[#18181B] dark:text-[#F4F4F5]"
             }`}
           >
             {column.tasks.length}
@@ -316,10 +318,10 @@ function KanbanColumn({
           variant="ghost"
           size="icon-sm"
           onClick={() => setIsAddingTask(true)}
-          className="hover:bg-white hover:border border-[#18181B]"
-          title="Add task"
+          className="hover:bg-white dark:hover:bg-[#202029] hover:border border-[#18181B] dark:border-[#3F3F4A]"
+          title={t.views.kanban.quickAddTask}
         >
-          <Plus className="w-4 h-4 text-[#18181B]" />
+          <Plus className="w-4 h-4 text-[#18181B] dark:text-[#F4F4F5]" />
         </Button>
       </div>
 
@@ -340,21 +342,20 @@ function KanbanColumn({
         </SortableContext>
 
         {column.tasks.length === 0 && !isAddingTask && (
-          <div className="p-6 text-center border-2 border-dashed border-[#18181B]/20 rounded-xl text-xs text-[#A1A1AA] font-bold">
-            Drop tasks here or click + to add
+          <div className="py-8 text-center text-xs text-[#71717A] dark:text-[#A1A1AA] italic">
+            {t.views.kanban.emptyColumn}
           </div>
         )}
 
-        {/* Quick inline task add input */}
         {isAddingTask && (
           <form
             onSubmit={handleQuickCreate}
-            className="p-3 rounded-xl border-2 border-[#18181B] bg-white shadow-retro-sm space-y-2 animate-in fade-in-50"
+            className="p-3 rounded-xl border-2 border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#18181D] shadow-retro-sm space-y-2 animate-in fade-in-50"
           >
             <input
               type="text"
-              placeholder="What needs to be done?"
-              className="w-full text-xs font-bold text-[#18181B] focus:outline-none placeholder:text-[#A1A1AA]"
+              placeholder={t.tasks.taskTitlePlaceholder}
+              className="w-full text-xs font-bold text-[#18181B] dark:text-[#F4F4F5] bg-transparent focus:outline-none placeholder:text-[#A1A1AA] dark:placeholder:text-[#71717A]"
               value={taskTitle}
               onChange={(e) => setTaskTitle(e.target.value)}
               autoFocus
@@ -372,7 +373,7 @@ function KanbanColumn({
                 disabled={isSubmitting}
                 className="h-7 text-xs"
               >
-                Cancel
+                {t.common.cancel}
               </Button>
               <Button
                 type="submit"
@@ -381,7 +382,7 @@ function KanbanColumn({
                 disabled={isSubmitting || !taskTitle.trim()}
                 className="h-7 text-xs font-bold"
               >
-                Add Task
+                {t.common.create}
               </Button>
             </div>
           </form>
@@ -390,13 +391,13 @@ function KanbanColumn({
 
       {/* Column Footer */}
       {!isAddingTask && (
-        <div className="p-2.5 border-t border-[#E4E4E7] bg-[#FDFBF7] rounded-b-2xl">
+        <div className="p-2.5 border-t border-[#E4E4E7] dark:border-[#2E2E38] bg-[#FDFBF7] dark:bg-[#18181D] rounded-b-2xl">
           <button
             onClick={() => setIsAddingTask(true)}
-            className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-bold text-[#71717A] hover:text-[#18181B] hover:bg-white rounded-lg border border-transparent hover:border-[#18181B] transition-all"
+            className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-bold text-[#71717A] dark:text-[#A1A1AA] hover:text-[#18181B] dark:hover:text-[#F4F4F5] hover:bg-white dark:hover:bg-[#202029] rounded-lg border border-transparent hover:border-[#18181B] dark:hover:border-[#3F3F4A] transition-all"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Add Task</span>
+            <span>{t.views.kanban.quickAddTask}</span>
           </button>
         </div>
       )}
@@ -422,7 +423,6 @@ export function KanbanBoardView({
   const [columns, setColumns] = useState(initialColumns);
   const [activeTask, setActiveTask] = useState<KanbanTask | null>(null);
 
-  // Sync state if initialColumns update
   React.useEffect(() => {
     setColumns(initialColumns);
   }, [initialColumns]);
@@ -463,7 +463,6 @@ export function KanbanBoardView({
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    // Find current source & target columns
     const sourceCol = columns.find((c) => c.tasks.some((t) => t.id === activeId));
     let targetCol = columns.find((c) => c.tasks.some((t) => t.id === overId));
 
@@ -473,7 +472,6 @@ export function KanbanBoardView({
 
     if (!sourceCol || !targetCol || sourceCol.id === targetCol.id) return;
 
-    // Optimistically update column position
     setColumns((prev) => {
       const movingTask = sourceCol.tasks.find((t) => t.id === activeId)!;
       return prev.map((c) => {
@@ -497,7 +495,6 @@ export function KanbanBoardView({
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    // Find column containing active task
     const col = columns.find((c) => c.tasks.some((t) => t.id === activeId));
     if (!col) return;
 
@@ -505,7 +502,6 @@ export function KanbanBoardView({
     const prevTask = col.tasks[activeIndex - 1];
     const nextTask = col.tasks[activeIndex + 1];
 
-    // Persist to database via server action
     try {
       await moveTaskAction({
         taskId: activeId,
@@ -543,8 +539,8 @@ export function KanbanBoardView({
 
         <DragOverlay>
           {activeTask ? (
-            <div className="p-3.5 rounded-xl border-2 border-[#18181B] bg-white shadow-retro-lg rotate-2 scale-105 pointer-events-none">
-              <h4 className="text-xs sm:text-sm font-black text-[#18181B]">
+            <div className="p-3.5 rounded-xl border-2 border-[#18181B] dark:border-[#FF6B4A] bg-white dark:bg-[#18181D] shadow-retro-lg rotate-2 scale-105 pointer-events-none">
+              <h4 className="text-xs sm:text-sm font-black text-[#18181B] dark:text-[#F4F4F5]">
                 {activeTask.title}
               </h4>
             </div>

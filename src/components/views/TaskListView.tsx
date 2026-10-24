@@ -14,14 +14,11 @@ import {
   CheckSquare,
   Trash2,
   Filter,
-  CheckCircle2,
-  Clock,
-  User,
-  AlertCircle,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { TaskPriority } from "@prisma/client";
 import { TaskDetailDrawer, TaskDetailData } from "@/components/tasks/TaskDetailDrawer";
+import { useTranslation } from "@/lib/i18n/context";
 
 export interface ListTask {
   id: string;
@@ -60,6 +57,7 @@ export function TaskListView({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
 
   // Selection state for bulk actions
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -69,9 +67,9 @@ export function TaskListView({
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   // Filtering
-  const filteredTasks = tasks.filter((t) => {
-    if (priorityFilter !== "ALL" && t.priority !== priorityFilter) return false;
-    if (statusFilter !== "ALL" && t.column.id !== statusFilter) return false;
+  const filteredTasks = tasks.filter((tItem) => {
+    if (priorityFilter !== "ALL" && tItem.priority !== priorityFilter) return false;
+    if (statusFilter !== "ALL" && tItem.column.id !== statusFilter) return false;
     return true;
   });
 
@@ -104,7 +102,7 @@ export function TaskListView({
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedIds(sortedTasks.map((t) => t.id));
+      setSelectedIds(sortedTasks.map((tItem) => tItem.id));
     } else {
       setSelectedIds([]);
     }
@@ -124,22 +122,18 @@ export function TaskListView({
       action: "SET_PRIORITY",
       value: newPriority,
     });
-    toast.success(`Updated priority for ${selectedIds.length} tasks`);
+    toast.success(`${t.views.list.bulkPriority}: ${selectedIds.length}`);
     setSelectedIds([]);
     router.refresh();
   };
 
   const handleBulkDelete = async () => {
-    if (
-      confirm(
-        `Are you sure you want to delete ${selectedIds.length} selected tasks?`
-      )
-    ) {
+    if (confirm(t.tasks.deleteTaskConfirm)) {
       await bulkUpdateTasksAction({
         taskIds: selectedIds,
         action: "DELETE",
       });
-      toast.success(`Deleted ${selectedIds.length} tasks`);
+      toast.success(t.tasks.taskDeletedSuccess);
       setSelectedIds([]);
       router.refresh();
     }
@@ -160,34 +154,34 @@ export function TaskListView({
   return (
     <div className="space-y-4">
       {/* Filters & Controls Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-[#18181B] bg-white shadow-retro-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#18181D] shadow-retro-sm">
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-[#18181B]">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">
             <Filter className="w-3.5 h-3.5 text-[#FF6B4A]" />
-            <span>Filters:</span>
+            <span>{t.common.filter}:</span>
           </div>
 
           {/* Priority filter */}
           <select
-            className="text-xs font-bold rounded-lg border border-[#18181B] bg-[#F5F2EB] px-2.5 py-1"
+            className="text-xs font-bold rounded-lg border border-[#18181B] dark:border-[#3F3F4A] bg-[#F5F2EB] dark:bg-[#15151A] text-[#18181B] dark:text-[#F4F4F5] px-2.5 py-1"
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
           >
-            <option value="ALL">All Priorities</option>
-            <option value="URGENT">Urgent</option>
-            <option value="HIGH">High</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="LOW">Low</option>
-            <option value="NONE">No Priority</option>
+            <option value="ALL">{t.common.all} ({t.common.priority})</option>
+            <option value="URGENT">{t.priorities.URGENT}</option>
+            <option value="HIGH">{t.priorities.HIGH}</option>
+            <option value="MEDIUM">{t.priorities.MEDIUM}</option>
+            <option value="LOW">{t.priorities.LOW}</option>
+            <option value="NONE">{t.priorities.NONE}</option>
           </select>
 
           {/* Column/Status filter */}
           <select
-            className="text-xs font-bold rounded-lg border border-[#18181B] bg-[#F5F2EB] px-2.5 py-1"
+            className="text-xs font-bold rounded-lg border border-[#18181B] dark:border-[#3F3F4A] bg-[#F5F2EB] dark:bg-[#15151A] text-[#18181B] dark:text-[#F4F4F5] px-2.5 py-1"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="ALL">All Columns</option>
+            <option value="ALL">{t.common.all} ({t.common.status})</option>
             {columns.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -205,22 +199,22 @@ export function TaskListView({
               }}
               className="text-xs h-7 text-[#FF6B4A]"
             >
-              Clear filters
+              {t.common.undo}
             </Button>
           )}
         </div>
 
-        <div className="text-xs font-bold text-[#71717A]">
-          Showing {sortedTasks.length} of {tasks.length} tasks
+        <div className="text-xs font-bold text-[#71717A] dark:text-[#A1A1AA]">
+          {sortedTasks.length} / {tasks.length}
         </div>
       </div>
 
       {/* Dense Table Container */}
-      <div className="rounded-2xl border-2 border-[#18181B] bg-white shadow-retro overflow-hidden">
+      <div className="rounded-2xl border-2 border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#18181D] shadow-retro overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b-2 border-[#18181B] bg-[#FDFBF7] text-[11px] font-black text-[#71717A] uppercase tracking-wider">
+              <tr className="border-b-2 border-[#18181B] dark:border-[#3F3F4A] bg-[#FDFBF7] dark:bg-[#15151A] text-[11px] font-black text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider">
                 <th className="p-3 w-10 text-center">
                   <Checkbox
                     checked={
@@ -231,55 +225,55 @@ export function TaskListView({
                   />
                 </th>
                 <th
-                  className="p-3 cursor-pointer hover:text-[#18181B]"
+                  className="p-3 cursor-pointer hover:text-[#18181B] dark:hover:text-[#F4F4F5]"
                   onClick={() => {
                     setSortField("title");
                     setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
                   }}
                 >
                   <div className="flex items-center gap-1">
-                    <span>Task Title</span>
+                    <span>{t.common.title}</span>
                     <ArrowUpDown className="w-3 h-3" />
                   </div>
                 </th>
-                <th className="p-3">Column / State</th>
+                <th className="p-3">{t.common.status}</th>
                 <th
-                  className="p-3 cursor-pointer hover:text-[#18181B]"
+                  className="p-3 cursor-pointer hover:text-[#18181B] dark:hover:text-[#F4F4F5]"
                   onClick={() => {
                     setSortField("priority");
                     setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
                   }}
                 >
                   <div className="flex items-center gap-1">
-                    <span>Priority</span>
+                    <span>{t.common.priority}</span>
                     <ArrowUpDown className="w-3 h-3" />
                   </div>
                 </th>
-                <th className="p-3">Assignee</th>
+                <th className="p-3">{t.common.assignee}</th>
                 <th
-                  className="p-3 cursor-pointer hover:text-[#18181B]"
+                  className="p-3 cursor-pointer hover:text-[#18181B] dark:hover:text-[#F4F4F5]"
                   onClick={() => {
                     setSortField("dueDate");
                     setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
                   }}
                 >
                   <div className="flex items-center gap-1">
-                    <span>Due Date</span>
+                    <span>{t.common.dueDate}</span>
                     <ArrowUpDown className="w-3 h-3" />
                   </div>
                 </th>
-                <th className="p-3">Subtasks</th>
+                <th className="p-3">{t.tasks.subtasks}</th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-[#E4E4E7] text-xs">
+            <tbody className="divide-y divide-[#E4E4E7] dark:divide-[#2E2E38] text-xs">
               {sortedTasks.length === 0 ? (
                 <tr>
                   <td
                     colSpan={7}
-                    className="p-12 text-center text-xs text-[#71717A] font-bold"
+                    className="p-12 text-center text-xs text-[#71717A] dark:text-[#A1A1AA] font-bold"
                   >
-                    No tasks found matching current filters.
+                    {t.views.list.noTasks}
                   </td>
                 </tr>
               ) : (
@@ -298,8 +292,8 @@ export function TaskListView({
                     <tr
                       key={task.id}
                       onClick={() => handleOpenDetail(task.id)}
-                      className={`hover:bg-[#FDFBF7] cursor-pointer transition-colors ${
-                        isSelected ? "bg-[#FEF08A]/20" : ""
+                      className={`hover:bg-[#FDFBF7] dark:hover:bg-[#202029] cursor-pointer transition-colors ${
+                        isSelected ? "bg-[#FEF08A]/20 dark:bg-[#3D3512]/40" : ""
                       }`}
                     >
                       <td
@@ -312,14 +306,14 @@ export function TaskListView({
                         />
                       </td>
 
-                      <td className="p-3 font-bold text-[#18181B]">
+                      <td className="p-3 font-bold text-[#18181B] dark:text-[#F4F4F5]">
                         <span className="hover:text-[#FF6B4A] transition-colors">
                           {task.title}
                         </span>
                       </td>
 
-                      <td className="p-3 font-semibold text-[#52525B]">
-                        <span className="px-2 py-0.5 rounded bg-[#F5F2EB] border border-[#18181B]/40 text-[11px] font-bold">
+                      <td className="p-3 font-semibold text-[#52525B] dark:text-[#A1A1AA]">
+                        <span className="px-2 py-0.5 rounded bg-[#F5F2EB] dark:bg-[#202029] border border-[#18181B]/40 dark:border-[#3F3F4A] text-[11px] font-bold text-[#18181B] dark:text-[#F4F4F5]">
                           {task.column.name}
                         </span>
                       </td>
@@ -338,19 +332,19 @@ export function TaskListView({
                             }
                             size="sm"
                           >
-                            {task.priority}
+                            {t.priorities[task.priority] || task.priority}
                           </Badge>
                         )}
                       </td>
 
                       <td className="p-3">
                         {task.assignee ? (
-                          <div className="flex items-center gap-1.5 font-bold text-[11px] text-[#18181B]">
-                            <Avatar className="h-5 w-5">
+                          <div className="flex items-center gap-1.5 font-bold text-[11px] text-[#18181B] dark:text-[#F4F4F5]">
+                            <Avatar className="h-5 w-5 border border-[#18181B] dark:border-[#3F3F4A]">
                               {task.assignee.image && (
                                 <AvatarImage src={task.assignee.image} />
                               )}
-                              <AvatarFallback className="text-[9px]">
+                              <AvatarFallback className="text-[9px] bg-[#FF6B4A] text-white">
                                 {task.assignee.name?.[0] || "A"}
                               </AvatarFallback>
                             </Avatar>
@@ -360,7 +354,7 @@ export function TaskListView({
                           </div>
                         ) : (
                           <span className="text-[#A1A1AA] italic text-[11px]">
-                            Unassigned
+                            {t.common.unassigned}
                           </span>
                         )}
                       </td>
@@ -369,7 +363,7 @@ export function TaskListView({
                         {task.dueDate ? (
                           <span
                             className={`flex items-center gap-1 text-[11px] ${
-                              isOverdue ? "text-[#DC2626] font-bold" : "text-[#71717A]"
+                              isOverdue ? "text-[#DC2626] dark:text-[#EF4444] font-bold" : "text-[#71717A] dark:text-[#A1A1AA]"
                             }`}
                           >
                             <Calendar className="w-3 h-3" />
@@ -380,7 +374,7 @@ export function TaskListView({
                         )}
                       </td>
 
-                      <td className="p-3 font-bold text-[11px] text-[#71717A]">
+                      <td className="p-3 font-bold text-[11px] text-[#71717A] dark:text-[#A1A1AA]">
                         {totalSubs > 0 ? (
                           <span className="flex items-center gap-1">
                             <CheckSquare className="w-3 h-3" />
@@ -403,12 +397,12 @@ export function TaskListView({
 
       {/* Floating Bulk Action Bar */}
       {selectedIds.length > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#18181B] text-white p-3.5 px-6 rounded-2xl border-2 border-white shadow-retro-lg flex items-center gap-4 animate-in slide-in-from-bottom-5">
-          <span className="text-xs font-black text-[#FEF08A]">
-            {selectedIds.length} tasks selected
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-[#18181B] dark:bg-[#1E1E26] text-white p-3.5 px-6 rounded-2xl border-2 border-white dark:border-[#FF6B4A] shadow-retro-lg flex items-center gap-4 animate-in slide-in-from-bottom-5">
+          <span className="text-xs font-black text-[#FEF08A] dark:text-[#FACC15]">
+            {selectedIds.length} {t.views.list.selectedCount}
           </span>
 
-          <div className="h-4 w-px bg-white/30" />
+          <div className="h-4 w-px bg-white/30 dark:bg-white/20" />
 
           <div className="flex items-center gap-2">
             <Button
@@ -417,7 +411,7 @@ export function TaskListView({
               onClick={() => handleBulkPriority("HIGH")}
               className="text-xs font-bold"
             >
-              Mark High Priority
+              {t.views.list.bulkPriority}: {t.priorities.HIGH}
             </Button>
             <Button
               variant="secondary"
@@ -425,7 +419,7 @@ export function TaskListView({
               onClick={() => handleBulkPriority("URGENT")}
               className="text-xs font-bold text-[#FF6B4A]"
             >
-              Mark Urgent
+              {t.views.list.bulkPriority}: {t.priorities.URGENT}
             </Button>
             <Button
               variant="danger"
@@ -434,7 +428,7 @@ export function TaskListView({
               className="text-xs font-bold"
             >
               <Trash2 className="w-3.5 h-3.5 mr-1" />
-              Delete
+              {t.common.delete}
             </Button>
           </div>
 
@@ -444,7 +438,7 @@ export function TaskListView({
             onClick={() => setSelectedIds([])}
             className="text-xs text-[#A1A1AA] hover:text-white"
           >
-            Deselect
+            {t.common.cancel}
           </Button>
         </div>
       )}
