@@ -4,7 +4,6 @@ import React from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
 import { updateTaskAction } from "@/server/actions/task";
 import { toast } from "sonner";
 import {
@@ -13,11 +12,11 @@ import {
   Clock,
   CheckCircle2,
   FolderKanban,
-  Sparkles,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { TaskDetailDrawer, TaskDetailData } from "@/components/tasks/TaskDetailDrawer";
 import { TaskPriority } from "@prisma/client";
+import { useTranslation } from "@/lib/i18n/context";
 
 interface MyTaskItem {
   id: string;
@@ -61,6 +60,7 @@ export function MyTasksClientView({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
 
   const handleOpenDetail = (taskId: string) => {
     const params = new URLSearchParams(searchParams);
@@ -92,7 +92,7 @@ export function MyTasksClientView({
         : `Marked "${task.title}" as complete`,
       {
         action: {
-          label: "Undo",
+          label: t.common.undo,
           onClick: async () => {
             await updateTaskAction({
               taskId: task.id,
@@ -115,19 +115,19 @@ export function MyTasksClientView({
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         {icon}
-        <h3 className="text-sm font-black text-[#18181B] uppercase tracking-wider">
+        <h3 className="text-sm font-black text-[#18181B] dark:text-[#F4F4F5] uppercase tracking-wider">
           {title}
         </h3>
         <span
-          className={`text-[11px] font-black px-2 py-0.2 rounded-full border border-[#18181B] ${badgeStyle}`}
+          className={`text-[11px] font-black px-2 py-0.2 rounded-full border border-[#18181B] dark:border-[#3F3F4A] ${badgeStyle}`}
         >
           {tasks.length}
         </span>
       </div>
 
       {tasks.length === 0 ? (
-        <div className="p-4 rounded-xl border border-dashed border-[#18181B]/20 bg-white/50 text-xs text-[#A1A1AA] italic">
-          No tasks in this section.
+        <div className="p-4 rounded-xl border border-dashed border-[#18181B]/20 dark:border-[#3F3F4A] bg-white/50 dark:bg-[#15151A] text-xs text-[#A1A1AA] italic">
+          {t.views.myTasks.emptyGroup}
         </div>
       ) : (
         <div className="space-y-2">
@@ -138,8 +138,8 @@ export function MyTasksClientView({
               <div
                 key={task.id}
                 onClick={() => handleOpenDetail(task.id)}
-                className={`p-3 rounded-xl border-2 border-[#18181B] bg-white shadow-retro-sm hover:shadow-retro hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all flex items-center justify-between gap-3 cursor-pointer select-none ${
-                  isCompleted ? "opacity-60 bg-[#FDFBF7]" : ""
+                className={`p-3 rounded-xl border-2 border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#18181D] shadow-retro-sm hover:shadow-retro hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all flex items-center justify-between gap-3 cursor-pointer select-none ${
+                  isCompleted ? "opacity-60 bg-[#FDFBF7] dark:bg-[#15151A]" : ""
                 }`}
               >
                 <div className="flex items-center gap-3 truncate">
@@ -151,8 +151,8 @@ export function MyTasksClientView({
                   </div>
 
                   <span
-                    className={`text-xs font-bold text-[#18181B] truncate ${
-                      isCompleted ? "line-through text-[#71717A]" : ""
+                    className={`text-xs font-bold text-[#18181B] dark:text-[#F4F4F5] truncate ${
+                      isCompleted ? "line-through text-[#71717A] dark:text-[#A1A1AA]" : ""
                     }`}
                   >
                     {task.title}
@@ -160,9 +160,9 @@ export function MyTasksClientView({
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
-                  <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#71717A]">
+                  <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#71717A] dark:text-[#A1A1AA]">
                     <span
-                      className="w-2 h-2 rounded-full border border-[#18181B]"
+                      className="w-2 h-2 rounded-full border border-[#18181B] dark:border-[#3F3F4A]"
                       style={{ backgroundColor: task.project.accentColor }}
                     />
                     <span className="hidden sm:inline">{task.project.name}</span>
@@ -181,12 +181,12 @@ export function MyTasksClientView({
                       }
                       size="sm"
                     >
-                      {task.priority}
+                      {t.priorities[task.priority] || task.priority}
                     </Badge>
                   )}
 
                   {task.dueDate && (
-                    <span className="text-[11px] font-semibold text-[#71717A] flex items-center gap-1">
+                    <span className="text-[11px] font-semibold text-[#71717A] dark:text-[#A1A1AA] flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       <span>{formatDate(task.dueDate)}</span>
                     </span>
@@ -203,45 +203,52 @@ export function MyTasksClientView({
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="pb-4 border-b-2 border-[#18181B]">
-        <div className="inline-block px-2.5 py-0.5 rounded bg-[#FEF08A] border border-[#18181B] text-[11px] font-black text-[#18181B] mb-1">
-          PERSONAL TRIAGE
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b-2 border-[#18181B] dark:border-[#3F3F4A]">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#18181B] dark:text-[#F4F4F5] tracking-tight">
+            {t.views.myTasks.title}
+          </h1>
+          <p className="text-xs sm:text-sm text-[#71717A] dark:text-[#A1A1AA] font-medium mt-1">
+            {t.views.myTasks.subtitle}
+          </p>
         </div>
-        <h1 className="text-3xl font-black text-[#18181B] tracking-tight">My Tasks</h1>
-        <p className="text-xs sm:text-sm text-[#71717A] font-medium">
-          Organized chronological view of all items assigned to you.
-        </p>
       </div>
 
       {/* Sections */}
-      <div className="space-y-8">
-        {renderSection(
-          "Overdue",
-          overdue,
-          <AlertCircle className="w-4 h-4 text-[#DC2626]" />,
-          "bg-[#FEE2E2] text-[#DC2626]"
-        )}
+      <div className="space-y-6">
+        {/* Overdue */}
+        {overdue.length > 0 &&
+          renderSection(
+            t.views.myTasks.overdue,
+            overdue,
+            <AlertCircle className="w-4 h-4 text-[#DC2626] dark:text-[#EF4444]" />,
+            "bg-[#FEE2E2] dark:bg-[#3D1414] text-[#DC2626] dark:text-[#F87171]"
+          )}
 
+        {/* Due Today */}
         {renderSection(
-          "Due Today",
+          t.views.myTasks.today,
           today,
-          <Clock className="w-4 h-4 text-[#854D0E]" />,
-          "bg-[#FEF08A] text-[#854D0E]"
+          <Clock className="w-4 h-4 text-[#FF6B4A]" />,
+          "bg-[#FEF08A] dark:bg-[#3D3512] text-[#854D0E] dark:text-[#FACC15]"
         )}
 
+        {/* Upcoming */}
         {renderSection(
-          "Upcoming",
+          t.views.myTasks.upcoming,
           upcoming,
-          <Calendar className="w-4 h-4 text-[#18181B]" />,
-          "bg-[#E0D8FF] text-[#18181B]"
+          <Calendar className="w-4 h-4 text-[#8B5CF6] dark:text-[#A78BFA]" />,
+          "bg-[#E0D8FF] dark:bg-[#2D2350] text-[#6B21A8] dark:text-[#C4B5FD]"
         )}
 
-        {renderSection(
-          "Completed",
-          completed,
-          <CheckCircle2 className="w-4 h-4 text-[#166534]" />,
-          "bg-[#D1FAE5] text-[#166534]"
-        )}
+        {/* Completed */}
+        {completed.length > 0 &&
+          renderSection(
+            t.views.myTasks.completed,
+            completed,
+            <CheckCircle2 className="w-4 h-4 text-[#10B981] dark:text-[#34D399]" />,
+            "bg-[#D1FAE5] dark:bg-[#143528] text-[#065F46] dark:text-[#6EE7B7]"
+          )}
       </div>
 
       {/* Task Detail Slide-Over Drawer */}

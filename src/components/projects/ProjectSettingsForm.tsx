@@ -9,6 +9,7 @@ import { updateProjectAction, deleteProjectAction } from "@/server/actions/proje
 import { toast } from "sonner";
 import { ProjectStatus } from "@prisma/client";
 import { Trash2, AlertTriangle } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/context";
 
 interface ProjectSettingsFormProps {
   project: {
@@ -29,6 +30,7 @@ export function ProjectSettingsForm({
   workspaceSlug,
 }: ProjectSettingsFormProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description || "");
   const [status, setStatus] = useState<ProjectStatus>(project.status);
@@ -83,10 +85,10 @@ export function ProjectSettingsForm({
 
   return (
     <div className="space-y-6">
-      <Card className="border-2 border-[#18181B] shadow-retro bg-white">
-        <CardHeader className="border-b border-[#E4E4E7]">
-          <CardTitle className="text-lg font-black">Project Details</CardTitle>
-          <CardDescription className="text-xs">
+      <Card className="border-2 border-[#18181B] dark:border-[#3F3F4A] shadow-retro bg-white dark:bg-[#18181D]">
+        <CardHeader className="border-b border-[#E4E4E7] dark:border-[#2E2E38]">
+          <CardTitle className="text-lg font-black text-[#18181B] dark:text-[#F4F4F5]">{t.projects.tabs.settings}</CardTitle>
+          <CardDescription className="text-xs text-[#71717A] dark:text-[#A1A1AA]">
             Manage initiative metadata and workflow parameters.
           </CardDescription>
         </CardHeader>
@@ -94,7 +96,7 @@ export function ProjectSettingsForm({
         <form onSubmit={handleSubmit}>
           <CardContent className="p-6 space-y-4">
             <div className="space-y-1">
-              <label className="text-xs font-bold text-[#18181B]">Project Name</label>
+              <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.projects.projectName}</label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -104,29 +106,29 @@ export function ProjectSettingsForm({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-[#18181B]">Status</label>
+                <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.projects.projectStatus}</label>
                 <select
-                  className="flex h-10 w-full rounded-lg border-2 border-[#18181B] bg-white px-3 py-2 text-xs font-bold text-[#18181B] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
+                  className="flex h-10 w-full rounded-lg border-2 border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#15151A] px-3 py-2 text-xs font-bold text-[#18181B] dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
                   value={status}
                   onChange={(e) => setStatus(e.target.value as ProjectStatus)}
                 >
-                  <option value="PLANNING">Planning</option>
-                  <option value="ACTIVE">Active</option>
-                  <option value="ON_HOLD">On Hold</option>
-                  <option value="COMPLETED">Completed</option>
-                  <option value="ARCHIVED">Archived</option>
+                  <option value="PLANNING">{t.projectStatuses.PLANNING}</option>
+                  <option value="ACTIVE">{t.projectStatuses.ACTIVE}</option>
+                  <option value="ON_HOLD">{t.projectStatuses.ON_HOLD}</option>
+                  <option value="COMPLETED">{t.projectStatuses.COMPLETED}</option>
+                  <option value="ARCHIVED">{t.projectStatuses.ARCHIVED}</option>
                 </select>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-[#18181B]">Accent Color</label>
+                <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.projects.accentColor}</label>
                 <div className="flex items-center gap-2 h-10">
                   {ACCENT_COLORS.map((c) => (
                     <button
                       key={c}
                       type="button"
                       onClick={() => setAccentColor(c)}
-                      className={`w-6 h-6 rounded-full border-2 border-[#18181B] transition-transform ${
+                      className={`w-6 h-6 rounded-full border-2 border-[#18181B] dark:border-[#3F3F4A] transition-transform ${
                         accentColor === c
                           ? "scale-125 shadow-retro-sm"
                           : "opacity-70 hover:opacity-100"
@@ -139,7 +141,7 @@ export function ProjectSettingsForm({
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-[#18181B]">Description</label>
+              <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.projects.projectDescription}</label>
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -155,27 +157,27 @@ export function ProjectSettingsForm({
               disabled={isSaving}
               className="font-bold"
             >
-              {isSaving ? "Saving changes..." : "Save Project Settings"}
+              {isSaving ? t.common.loading : t.common.save}
             </Button>
           </CardFooter>
         </form>
       </Card>
 
       {/* Danger Zone */}
-      <Card className="border-2 border-[#EF4444] shadow-retro bg-[#FFF5F5]">
+      <Card className="border-2 border-[#EF4444] shadow-retro bg-[#FFF5F5] dark:bg-[#2A1414]">
         <CardHeader className="border-b border-[#EF4444]/20">
-          <div className="flex items-center gap-2 text-[#DC2626]">
+          <div className="flex items-center gap-2 text-[#DC2626] dark:text-[#F87171]">
             <AlertTriangle className="w-5 h-5" />
-            <CardTitle className="text-base font-black">Danger Zone</CardTitle>
+            <CardTitle className="text-base font-black">{t.workspaces.dangerZone}</CardTitle>
           </div>
-          <CardDescription className="text-xs text-[#DC2626]/80">
+          <CardDescription className="text-xs text-[#DC2626]/80 dark:text-[#F87171]/80">
             Permanently delete this project and all associated tasks, boards, and comments.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6 flex items-center justify-between">
           <div>
-            <div className="text-xs font-bold text-[#18181B]">Delete this project</div>
-            <div className="text-[11px] text-[#71717A]">
+            <div className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">Delete this project</div>
+            <div className="text-[11px] text-[#71717A] dark:text-[#A1A1AA]">
               Once deleted, all data is permanently unrecoverable.
             </div>
           </div>
@@ -188,7 +190,7 @@ export function ProjectSettingsForm({
             className="font-bold"
           >
             <Trash2 className="w-3.5 h-3.5 mr-1" />
-            {isDeleting ? "Deleting..." : "Delete Project"}
+            {isDeleting ? t.common.loading : t.common.delete}
           </Button>
         </CardContent>
       </Card>
