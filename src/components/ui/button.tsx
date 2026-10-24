@@ -9,21 +9,21 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-[#FF6B4A] text-white border-2 border-[#18181B] shadow-retro hover:bg-[#FA5530]",
+          "bg-[#FF6B4A] text-white border-2 border-[#18181B] dark:border-[#3F3F4A] shadow-retro hover:bg-[#FA5530]",
         secondary:
-          "bg-[#F5F2EB] text-[#18181B] border-2 border-[#18181B] shadow-retro hover:bg-[#EAE4D9]",
+          "bg-[#F5F2EB] dark:bg-[#202029] text-[#18181B] dark:text-[#F4F4F5] border-2 border-[#18181B] dark:border-[#3F3F4A] shadow-retro hover:bg-[#EAE4D9] dark:hover:bg-[#2A2A36]",
         outline:
-          "bg-white text-[#18181B] border-2 border-[#18181B] shadow-retro-sm hover:bg-[#FDFBF7]",
+          "bg-white dark:bg-[#18181D] text-[#18181B] dark:text-[#F4F4F5] border-2 border-[#18181B] dark:border-[#3F3F4A] shadow-retro-sm hover:bg-[#FDFBF7] dark:hover:bg-[#22222A]",
         ghost:
-          "text-[#18181B] hover:bg-[#F5F2EB] hover:text-[#18181B] border-none shadow-none",
+          "text-[#18181B] dark:text-[#F4F4F5] hover:bg-[#F5F2EB] dark:hover:bg-[#202029] hover:text-[#18181B] dark:hover:text-[#F4F4F5] border-none shadow-none",
         danger:
-          "bg-[#EF4444] text-white border-2 border-[#18181B] shadow-retro hover:bg-[#DC2626]",
+          "bg-[#EF4444] text-white border-2 border-[#18181B] dark:border-[#3F3F4A] shadow-retro hover:bg-[#DC2626]",
         lavender:
-          "bg-[#E0D8FF] text-[#18181B] border-2 border-[#18181B] shadow-retro hover:bg-[#D4C8FF]",
+          "bg-[#E0D8FF] dark:bg-[#2D2350] text-[#18181B] dark:text-[#C4B5FD] border-2 border-[#18181B] dark:border-[#3F3F4A] shadow-retro hover:bg-[#D4C8FF]",
         butter:
-          "bg-[#FEF08A] text-[#18181B] border-2 border-[#18181B] shadow-retro hover:bg-[#FDE047]",
+          "bg-[#FEF08A] dark:bg-[#3D3512] text-[#18181B] dark:text-[#FDE047] border-2 border-[#18181B] dark:border-[#3F3F4A] shadow-retro hover:bg-[#FDE047]",
         sage:
-          "bg-[#D1FAE5] text-[#18181B] border-2 border-[#18181B] shadow-retro hover:bg-[#A7F3D0]",
+          "bg-[#D1FAE5] dark:bg-[#143528] text-[#18181B] dark:text-[#6EE7B7] border-2 border-[#18181B] dark:border-[#3F3F4A] shadow-retro hover:bg-[#A7F3D0]",
       },
       size: {
         default: "h-10 px-4 py-2",

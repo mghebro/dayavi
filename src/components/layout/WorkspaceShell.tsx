@@ -11,11 +11,9 @@ import {
   Settings,
   Plus,
   Search,
-  Keyboard,
   ChevronDown,
   LogOut,
   Building2,
-  FolderPlus,
   Menu,
   X,
 } from "lucide-react";
@@ -33,6 +31,9 @@ import { KeyboardShortcutsModal } from "@/components/productivity/KeyboardShortc
 import { QuickCreateTaskModal } from "@/components/tasks/QuickCreateTaskModal";
 import { QuickCreateProjectModal } from "@/components/projects/QuickCreateProjectModal";
 import { QuickCreateWorkspaceModal } from "@/components/workspaces/QuickCreateWorkspaceModal";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { useTranslation } from "@/lib/i18n/context";
 import { logoutUser } from "@/server/actions/auth";
 
 interface WorkspaceShellProps {
@@ -80,6 +81,7 @@ export function WorkspaceShell({
 }: WorkspaceShellProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useTranslation();
 
   // Modals state
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -89,22 +91,22 @@ export function WorkspaceShell({
 
   const navLinks = [
     {
-      name: "Dashboard",
+      name: t.nav.dashboard,
       href: `/app/${currentWorkspace.slug}/dashboard`,
       icon: LayoutDashboard,
     },
     {
-      name: "My Tasks",
+      name: t.nav.myTasks,
       href: `/app/${currentWorkspace.slug}/my-tasks`,
       icon: CheckSquare,
     },
     {
-      name: "Projects",
+      name: t.nav.projects,
       href: `/app/${currentWorkspace.slug}/projects`,
       icon: FolderKanban,
     },
     {
-      name: "Notifications",
+      name: t.nav.notifications,
       href: `/app/${currentWorkspace.slug}/notifications`,
       icon: Bell,
       badge: unreadNotificationsCount > 0 ? unreadNotificationsCount : null,
@@ -124,39 +126,39 @@ export function WorkspaceShell({
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] flex">
+    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#0F0F12] flex text-[#18181B] dark:text-[#F4F4F5]">
       {/* ----------------------------------------------------
        * DESKTOP & MOBILE SIDEBAR
        * ---------------------------------------------------- */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#F5F2EB] border-r-2 border-[#18181B] flex flex-col justify-between transition-transform duration-200 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#F5F2EB] dark:bg-[#15151A] border-r-2 border-[#18181B] dark:border-[#2E2E38] flex flex-col justify-between transition-transform duration-200 lg:translate-x-0 ${
           isMobileSidebarOpen ? "translate-x-0 shadow-retro-lg" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col flex-1 overflow-y-auto">
           {/* Workspace Switcher */}
-          <div className="p-4 border-b-2 border-[#18181B] bg-[#FDFBF7]">
+          <div className="p-4 border-b-2 border-[#18181B] dark:border-[#2E2E38] bg-[#FDFBF7] dark:bg-[#121216]">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="w-full flex items-center justify-between p-2 rounded-xl bg-white border-2 border-[#18181B] shadow-retro-sm hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all text-left">
+                <button className="w-full flex items-center justify-between p-2 rounded-xl bg-white dark:bg-[#1C1C22] border-2 border-[#18181B] dark:border-[#3F3F4A] shadow-retro-sm hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all text-left">
                   <div className="flex items-center gap-2.5 truncate">
                     <div
-                      className="w-7 h-7 rounded-lg border-2 border-[#18181B] flex items-center justify-center text-white font-black text-xs shadow-retro-sm shrink-0"
+                      className="w-7 h-7 rounded-lg border-2 border-[#18181B] dark:border-[#3F3F4A] flex items-center justify-center text-white font-black text-xs shadow-retro-sm shrink-0"
                       style={{ backgroundColor: currentWorkspace.accentColor }}
                     >
                       {currentWorkspace.name.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-xs font-black text-[#18181B] truncate">
+                    <span className="text-xs font-black text-[#18181B] dark:text-[#F4F4F5] truncate">
                       {currentWorkspace.name}
                     </span>
                   </div>
-                  <ChevronDown className="w-4 h-4 text-[#71717A] shrink-0" />
+                  <ChevronDown className="w-4 h-4 text-[#71717A] dark:text-[#A1A1AA] shrink-0" />
                 </button>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className="w-56 p-1.5" align="start">
-                <div className="text-[10px] font-black text-[#71717A] uppercase tracking-wider px-2 py-1">
-                  Workspaces
+              <DropdownMenuContent className="w-56 p-1.5 bg-white dark:bg-[#18181D] border-2 border-[#18181B] dark:border-[#3F3F4A]" align="start">
+                <div className="text-[10px] font-black text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider px-2 py-1">
+                  {t.workspaces.settingsTitle}
                 </div>
                 {workspaces.map((ws) => (
                   <DropdownMenuItem
@@ -165,31 +167,31 @@ export function WorkspaceShell({
                       router.push(`/app/${ws.slug}/dashboard`);
                       router.refresh();
                     }}
-                    className="flex items-center justify-between cursor-pointer"
+                    className="flex items-center justify-between cursor-pointer hover:bg-[#F5F2EB] dark:hover:bg-[#252530]"
                   >
                     <div className="flex items-center gap-2">
                       <span
-                        className="w-2.5 h-2.5 rounded-full border border-[#18181B]"
+                        className="w-2.5 h-2.5 rounded-full border border-[#18181B] dark:border-[#3F3F4A]"
                         style={{ backgroundColor: ws.accentColor }}
                       />
-                      <span className="font-bold text-xs truncate">{ws.name}</span>
+                      <span className="font-bold text-xs truncate text-[#18181B] dark:text-[#F4F4F5]">{ws.name}</span>
                     </div>
                     {ws.id === currentWorkspace.id && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-[#FEF08A] border border-[#18181B]">
+                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-[#FEF08A] dark:bg-[#3D3512] text-[#18181B] dark:text-[#FACC15] border border-[#18181B] dark:border-[#FACC15]">
                         Active
                       </span>
                     )}
                   </DropdownMenuItem>
                 ))}
 
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="bg-[#E4E4E7] dark:bg-[#2E2E38]" />
 
                 <DropdownMenuItem
                   onClick={() => setIsWorkspaceModalOpen(true)}
-                  className="flex items-center gap-2 text-[#FF6B4A] font-bold cursor-pointer"
+                  className="flex items-center gap-2 text-[#FF6B4A] font-bold cursor-pointer hover:bg-[#F5F2EB] dark:hover:bg-[#252530]"
                 >
                   <Building2 className="w-4 h-4" />
-                  <span>Create Workspace</span>
+                  <span>{t.nav.newWorkspace}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -207,12 +209,12 @@ export function WorkspaceShell({
                   onClick={() => setIsMobileSidebarOpen(false)}
                   className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-all ${
                     isActive
-                      ? "bg-white text-[#18181B] border-2 border-[#18181B] shadow-retro-sm"
-                      : "text-[#52525B] hover:bg-[#EAE4D9] hover:text-[#18181B]"
+                      ? "bg-white dark:bg-[#202029] text-[#18181B] dark:text-[#F4F4F5] border-2 border-[#18181B] dark:border-[#FF6B4A] shadow-retro-sm"
+                      : "text-[#52525B] dark:text-[#A1A1AA] hover:bg-[#EAE4D9] dark:hover:bg-[#1E1E26] hover:text-[#18181B] dark:hover:text-[#F4F4F5]"
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${isActive ? "text-[#FF6B4A]" : "text-[#71717A]"}`} />
+                    <Icon className={`w-4 h-4 ${isActive ? "text-[#FF6B4A]" : "text-[#71717A] dark:text-[#A1A1AA]"}`} />
                     <span>{link.name}</span>
                   </div>
                   {link.badge && (
@@ -228,13 +230,13 @@ export function WorkspaceShell({
           {/* Projects Sidebar Section */}
           <div className="p-3 pt-2">
             <div className="flex items-center justify-between px-3 py-1 mb-1">
-              <span className="text-[11px] font-black text-[#71717A] uppercase tracking-wider">
-                Projects
+              <span className="text-[11px] font-black text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider">
+                {t.projects.allProjects}
               </span>
               <button
                 onClick={() => setIsProjectModalOpen(true)}
-                className="w-5 h-5 rounded border border-[#18181B] bg-white hover:bg-[#FEF08A] flex items-center justify-center text-[#18181B] transition-colors"
-                title="Create Project"
+                className="w-5 h-5 rounded border border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#202029] hover:bg-[#FEF08A] dark:hover:bg-[#3D3512] flex items-center justify-center text-[#18181B] dark:text-[#F4F4F5] transition-colors"
+                title={t.projects.createProject}
               >
                 <Plus className="w-3.5 h-3.5" />
               </button>
@@ -243,7 +245,7 @@ export function WorkspaceShell({
             <div className="space-y-0.5 max-h-56 overflow-y-auto">
               {projects.length === 0 ? (
                 <div className="px-3 py-2 text-[11px] text-[#A1A1AA] italic">
-                  No projects yet
+                  {t.projects.noProjectsFound}
                 </div>
               ) : (
                 projects.map((proj) => {
@@ -255,13 +257,13 @@ export function WorkspaceShell({
                       onClick={() => setIsMobileSidebarOpen(false)}
                       className={`flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                         isProjectActive
-                          ? "bg-white text-[#18181B] border border-[#18181B] shadow-retro-sm font-bold"
-                          : "text-[#52525B] hover:bg-[#EAE4D9] hover:text-[#18181B]"
+                          ? "bg-white dark:bg-[#202029] text-[#18181B] dark:text-[#F4F4F5] border border-[#18181B] dark:border-[#3F3F4A] shadow-retro-sm font-bold"
+                          : "text-[#52525B] dark:text-[#A1A1AA] hover:bg-[#EAE4D9] dark:hover:bg-[#1E1E26] hover:text-[#18181B] dark:hover:text-[#F4F4F5]"
                       }`}
                     >
                       <div className="flex items-center gap-2 truncate">
                         <span
-                          className="w-2.5 h-2.5 rounded-full border border-[#18181B] shrink-0"
+                          className="w-2.5 h-2.5 rounded-full border border-[#18181B] dark:border-[#3F3F4A] shrink-0"
                           style={{ backgroundColor: proj.accentColor }}
                         />
                         <span className="truncate">{proj.name}</span>
@@ -275,32 +277,40 @@ export function WorkspaceShell({
         </div>
 
         {/* Sidebar Footer */}
-        <div className="p-3 border-t-2 border-[#18181B] bg-[#FDFBF7] space-y-2">
+        <div className="p-3 border-t-2 border-[#18181B] dark:border-[#2E2E38] bg-[#FDFBF7] dark:bg-[#121216] space-y-2">
+          {/* Mobile language & theme switcher */}
+          <div className="flex items-center justify-between lg:hidden pb-2 border-b border-[#E4E4E7] dark:border-[#2E2E38]">
+            <LanguageSwitcher variant="pill" />
+            <ThemeToggle variant="icon" />
+          </div>
+
           <Link
             href={`/app/${currentWorkspace.slug}/settings`}
             onClick={() => setIsMobileSidebarOpen(false)}
             className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               pathname.endsWith("/settings")
-                ? "bg-white text-[#18181B] border border-[#18181B] shadow-retro-sm"
-                : "text-[#71717A] hover:bg-[#EAE4D9] hover:text-[#18181B]"
+                ? "bg-white dark:bg-[#202029] text-[#18181B] dark:text-[#F4F4F5] border border-[#18181B] dark:border-[#3F3F4A] shadow-retro-sm"
+                : "text-[#71717A] dark:text-[#A1A1AA] hover:bg-[#EAE4D9] dark:hover:bg-[#1E1E26] hover:text-[#18181B] dark:hover:text-[#F4F4F5]"
             }`}
           >
             <Settings className="w-4 h-4" />
-            <span>Workspace Settings</span>
+            <span>{t.workspaces.settingsTitle}</span>
           </Link>
 
           {/* User Profile Bar */}
-          <div className="flex items-center justify-between pt-2 border-t border-[#E4E4E7]">
+          <div className="flex items-center justify-between pt-2 border-t border-[#E4E4E7] dark:border-[#2E2E38]">
             <div className="flex items-center gap-2 truncate">
-              <Avatar className="h-7 w-7">
+              <Avatar className="h-7 w-7 border border-[#18181B] dark:border-[#3F3F4A]">
                 {user.image ? <AvatarImage src={user.image} /> : null}
-                <AvatarFallback>{userInitials}</AvatarFallback>
+                <AvatarFallback className="bg-[#FF6B4A] text-white font-black text-[10px]">
+                  {userInitials}
+                </AvatarFallback>
               </Avatar>
               <div className="flex flex-col truncate">
-                <span className="text-xs font-bold text-[#18181B] truncate">
+                <span className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5] truncate">
                   {user.name || "Teammate"}
                 </span>
-                <span className="text-[10px] text-[#71717A] truncate">
+                <span className="text-[10px] text-[#71717A] dark:text-[#A1A1AA] truncate">
                   {user.email || ""}
                 </span>
               </div>
@@ -308,8 +318,8 @@ export function WorkspaceShell({
 
             <button
               onClick={handleLogout}
-              className="p-1.5 rounded-md hover:bg-[#FEE2E2] text-[#71717A] hover:text-[#DC2626] transition-colors"
-              title="Sign Out"
+              className="p-1.5 rounded-md hover:bg-[#FEE2E2] dark:hover:bg-[#3D1414] text-[#71717A] dark:text-[#A1A1AA] hover:text-[#DC2626] dark:hover:text-[#EF4444] transition-colors"
+              title={t.nav.signOut}
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -321,7 +331,7 @@ export function WorkspaceShell({
       {isMobileSidebarOpen && (
         <div
           onClick={() => setIsMobileSidebarOpen(false)}
-          className="fixed inset-0 z-30 bg-[#18181B]/40 lg:hidden"
+          className="fixed inset-0 z-30 bg-[#18181B]/50 dark:bg-black/60 lg:hidden"
         />
       )}
 
@@ -330,12 +340,12 @@ export function WorkspaceShell({
        * ---------------------------------------------------- */}
       <div className="flex-1 flex flex-col lg:pl-64 min-w-0">
         {/* TopBar */}
-        <header className="sticky top-0 z-20 h-16 bg-[#FDFBF7]/90 backdrop-blur-md border-b-2 border-[#18181B] px-4 sm:px-8 flex items-center justify-between">
+        <header className="sticky top-0 z-20 h-16 bg-[#FDFBF7]/90 dark:bg-[#0F0F12]/90 backdrop-blur-md border-b-2 border-[#18181B] dark:border-[#2E2E38] px-4 sm:px-8 flex items-center justify-between">
           {/* Left: Mobile hamburger & breadcrumbs */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileSidebarOpen((prev) => !prev)}
-              className="p-1.5 rounded-lg border-2 border-[#18181B] bg-white lg:hidden shadow-retro-sm"
+              className="p-1.5 rounded-lg border-2 border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#1C1C22] text-[#18181B] dark:text-[#F4F4F5] lg:hidden shadow-retro-sm"
               aria-label="Toggle Navigation"
             >
               {isMobileSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -343,29 +353,39 @@ export function WorkspaceShell({
 
             <Link
               href={`/app/${currentWorkspace.slug}/dashboard`}
-              className="flex items-center gap-2 text-xs font-bold text-[#71717A] hover:text-[#18181B] transition-colors"
+              className="flex items-center gap-2 text-xs font-bold text-[#71717A] dark:text-[#A1A1AA] hover:text-[#18181B] dark:hover:text-[#F4F4F5] transition-colors"
             >
-              <span className="font-black text-[#18181B]">Dayavi</span>
+              <span className="font-black text-[#18181B] dark:text-[#F4F4F5]">
+                {t.brand.name}
+              </span>
               <span>/</span>
-              <span className="truncate max-w-[140px] sm:max-w-none text-[#18181B]">
+              <span className="truncate max-w-[140px] sm:max-w-none text-[#18181B] dark:text-[#F4F4F5]">
                 {currentWorkspace.name}
               </span>
             </Link>
           </div>
 
-          {/* Right: Quick actions, Search trigger, New Task */}
+          {/* Right: Language, Theme, Search trigger, New Task */}
           <div className="flex items-center gap-2.5">
+            {/* Language Switcher */}
+            <div className="hidden sm:block">
+              <LanguageSwitcher variant="pill" />
+            </div>
+
+            {/* Theme Toggle */}
+            <ThemeToggle variant="icon" />
+
             {/* Cmd+K Search trigger */}
             <button
               onClick={() => {
                 const event = new KeyboardEvent("keydown", { key: "k", metaKey: true });
                 window.dispatchEvent(event);
               }}
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border-2 border-[#18181B] shadow-retro-sm text-xs font-semibold text-[#71717A] hover:bg-[#F5F2EB] transition-all"
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-[#1C1C22] border-2 border-[#18181B] dark:border-[#3F3F4A] shadow-retro-sm text-xs font-semibold text-[#71717A] dark:text-[#A1A1AA] hover:bg-[#F5F2EB] dark:hover:bg-[#252530] transition-all"
             >
-              <Search className="w-3.5 h-3.5 text-[#18181B]" />
-              <span>Search...</span>
-              <kbd className="ml-2 px-1.5 py-0.2 rounded bg-[#F5F2EB] border border-[#18181B] text-[10px] font-black text-[#18181B]">
+              <Search className="w-3.5 h-3.5 text-[#18181B] dark:text-[#F4F4F5]" />
+              <span>{t.common.search}...</span>
+              <kbd className="ml-2 px-1.5 py-0.2 rounded bg-[#F5F2EB] dark:bg-[#262630] border border-[#18181B] dark:border-[#52525B] text-[10px] font-black text-[#18181B] dark:text-[#F4F4F5]">
                 ⌘K
               </kbd>
             </button>
@@ -378,13 +398,13 @@ export function WorkspaceShell({
               className="font-bold flex items-center gap-1.5"
             >
               <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">New Task</span>
+              <span className="hidden sm:inline">{t.nav.newTask}</span>
             </Button>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-8 min-w-0">{children}</main>
+        <main className="flex-1 p-4 sm:p-8 min-w-0 bg-[#FDFBF7] dark:bg-[#0F0F12]">{children}</main>
       </div>
 
       {/* Global Modals & Helpers */}

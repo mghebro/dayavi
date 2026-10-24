@@ -16,7 +16,7 @@ const SheetOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     className={cn(
-      "fixed inset-0 z-50 bg-[#18181B]/40 backdrop-blur-xs data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-[#18181B]/40 dark:bg-black/60 backdrop-blur-xs data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
@@ -36,14 +36,14 @@ const SheetContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed z-50 gap-4 bg-white p-6 transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-400",
-        "inset-y-0 right-0 h-full w-3/4 border-l-2 border-[#18181B] shadow-retro-lg data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-xl md:max-w-2xl overflow-y-auto",
+        "fixed z-50 gap-4 bg-white dark:bg-[#18181D] text-[#18181B] dark:text-[#F4F4F5] p-6 transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-400",
+        "inset-y-0 right-0 h-full w-3/4 border-l-2 border-[#18181B] dark:border-[#3F3F4A] shadow-retro-lg data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-xl md:max-w-2xl overflow-y-auto",
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md border border-[#18181B] p-1.5 text-[#18181B] opacity-70 transition-opacity hover:opacity-100 hover:bg-[#F5F2EB] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]">
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md border border-[#18181B] dark:border-[#3F3F4A] p-1.5 text-[#18181B] dark:text-[#F4F4F5] opacity-70 transition-opacity hover:opacity-100 hover:bg-[#F5F2EB] dark:hover:bg-[#252530] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
@@ -58,7 +58,7 @@ const SheetHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col space-y-2 text-left border-b border-[#E4E4E7] pb-4",
+      "flex flex-col space-y-2 text-center sm:text-left",
       className
     )}
     {...props}
@@ -66,13 +66,27 @@ const SheetHeader = ({
 );
 SheetHeader.displayName = "SheetHeader";
 
+const SheetFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn(
+      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+      className
+    )}
+    {...props}
+  />
+);
+SheetFooter.displayName = "SheetFooter";
+
 const SheetTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn("text-xl font-bold text-[#18181B]", className)}
+    className={cn("text-lg font-bold text-[#18181B] dark:text-[#F4F4F5]", className)}
     {...props}
   />
 ));
@@ -84,7 +98,7 @@ const SheetDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-xs text-[#71717A]", className)}
+    className={cn("text-xs text-[#71717A] dark:text-[#A1A1AA] leading-relaxed", className)}
     {...props}
   />
 ));
@@ -98,6 +112,7 @@ export {
   SheetClose,
   SheetContent,
   SheetHeader,
+  SheetFooter,
   SheetTitle,
   SheetDescription,
 };
