@@ -15,6 +15,7 @@ import { Input, Textarea } from "@/components/ui/input";
 import { createWorkspaceAction } from "@/server/actions/workspace";
 import { toast } from "sonner";
 import { Building2 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/context";
 
 interface QuickCreateWorkspaceModalProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ export function QuickCreateWorkspaceModal({
   onClose,
 }: QuickCreateWorkspaceModalProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
@@ -73,27 +75,27 @@ export function QuickCreateWorkspaceModal({
         router.push(`/app/${res.workspace.slug}/dashboard`);
         router.refresh();
       } else {
-        toast.error(res.error || "Failed to create workspace.");
+        toast.error(res.error || "Failed to create workspace");
       }
-    } catch (err) {
-      toast.error("An error occurred while creating workspace.");
+    } catch (err: any) {
+      toast.error(err.message || "An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-lg">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#E0D8FF] border-2 border-[#18181B] flex items-center justify-center text-[#18181B] font-bold">
+            <div className="w-8 h-8 rounded-lg bg-[#D1FAE5] dark:bg-[#143528] border-2 border-[#18181B] dark:border-[#3F3F4A] flex items-center justify-center text-[#18181B] dark:text-[#6EE7B7] shadow-retro-sm">
               <Building2 className="w-4 h-4" />
             </div>
             <div>
-              <DialogTitle className="text-lg">Create New Workspace</DialogTitle>
+              <DialogTitle className="text-lg">{t.workspaces.createWorkspace}</DialogTitle>
               <DialogDescription>
-                A dedicated organizational home for your team and projects.
+                {t.nav.newWorkspace}
               </DialogDescription>
             </div>
           </div>
@@ -101,9 +103,9 @@ export function QuickCreateWorkspaceModal({
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#18181B]">Workspace Name *</label>
+            <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.workspaces.workspaceName} *</label>
             <Input
-              placeholder="e.g. Acme Creative Studio"
+              placeholder="e.g., Acme Studios"
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
               required
@@ -112,40 +114,47 @@ export function QuickCreateWorkspaceModal({
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#18181B]">Workspace Slug *</label>
-            <Input
-              placeholder="acme-creative-studio"
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-[#18181B]">Brand Accent Color</label>
-            <div className="flex items-center gap-2 h-10">
-              {WORKSPACE_COLORS.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setAccentColor(c)}
-                  className={`w-6 h-6 rounded-full border-2 border-[#18181B] transition-transform ${
-                    accentColor === c ? "scale-125 shadow-retro-sm" : "opacity-70 hover:opacity-100"
-                  }`}
-                  style={{ backgroundColor: c }}
-                />
-              ))}
+            <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.workspaces.workspaceSlug} *</label>
+            <div className="flex items-center">
+              <span className="px-2.5 py-2 rounded-l-lg border-2 border-r-0 border-[#18181B] dark:border-[#3F3F4A] bg-[#F5F2EB] dark:bg-[#202029] text-xs font-bold text-[#71717A] dark:text-[#A1A1AA]">
+                /app/
+              </span>
+              <input
+                type="text"
+                className="flex h-10 w-full rounded-r-lg border-2 border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#15151A] px-3 py-2 text-xs font-semibold text-[#18181B] dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
+                required
+              />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#18181B]">Description</label>
+            <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.workspaces.workspaceDescription}</label>
             <Textarea
-              placeholder="Optional overview of the workspace..."
+              placeholder="Describe what this team or workspace focuses on..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="text-xs min-h-[60px]"
             />
+          </div>
+
+          {/* Accent Color Selection */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.projects.accentColor}</label>
+            <div className="flex items-center gap-2">
+              {WORKSPACE_COLORS.map((col) => (
+                <button
+                  key={col}
+                  type="button"
+                  onClick={() => setAccentColor(col)}
+                  className={`w-7 h-7 rounded-lg border-2 border-[#18181B] dark:border-[#3F3F4A] transition-transform ${
+                    accentColor === col ? "scale-110 shadow-retro-sm" : "opacity-80 hover:opacity-100"
+                  }`}
+                  style={{ backgroundColor: col }}
+                />
+              ))}
+            </div>
           </div>
 
           <DialogFooter className="pt-2">
@@ -155,15 +164,15 @@ export function QuickCreateWorkspaceModal({
               onClick={onClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {t.common.cancel}
             </Button>
             <Button
               type="submit"
               variant="primary"
-              disabled={isSubmitting || !name.trim()}
+              disabled={isSubmitting || !name.trim() || !slug.trim()}
               className="font-bold"
             >
-              {isSubmitting ? "Creating..." : "Create Workspace"}
+              {isSubmitting ? t.common.loading : t.workspaces.createWorkspace}
             </Button>
           </DialogFooter>
         </form>

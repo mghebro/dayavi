@@ -10,12 +10,12 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/input";
+import { Input, Textarea } from "@/components/ui/input";
 import { createTaskAction, deleteTaskAction } from "@/server/actions/task";
 import { toast } from "sonner";
 import { TaskPriority } from "@prisma/client";
-import { Plus, Sparkles } from "lucide-react";
+import { Plus } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/context";
 
 interface QuickCreateTaskModalProps {
   isOpen: boolean;
@@ -40,6 +40,7 @@ export function QuickCreateTaskModal({
   defaultProjectId,
   defaultColumnId,
 }: QuickCreateTaskModalProps) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [projectId, setProjectId] = useState(defaultProjectId || projects[0]?.id || "");
@@ -83,14 +84,16 @@ export function QuickCreateTaskModal({
 
       if (res.success && res.task) {
         const createdTaskId = res.task.id;
-        const taskTitle = res.task.title;
-
-        toast.success(`Created task "${taskTitle}"`, {
+        toast.success(t.tasks.taskCreatedSuccess, {
           action: {
-            label: "Undo",
+            label: t.common.undo,
             onClick: async () => {
-              await deleteTaskAction(createdTaskId);
-              toast.info(`Undid creation of "${taskTitle}"`);
+              try {
+                await deleteTaskAction(createdTaskId);
+                toast.info(t.tasks.taskDeletedSuccess);
+              } catch (err) {
+                toast.error("Undo failed");
+              }
             },
           },
         });
@@ -99,29 +102,28 @@ export function QuickCreateTaskModal({
         setTitle("");
         setDescription("");
         setDueDate("");
+        setPriority("NONE");
         onClose();
-      } else {
-        toast.error("Failed to create task.");
       }
-    } catch (err) {
-      toast.error("An error occurred while creating task.");
+    } catch (err: any) {
+      toast.error(err.message || "An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#FF6B4A] border-2 border-[#18181B] flex items-center justify-center text-white font-bold">
+            <div className="w-8 h-8 rounded-lg bg-[#FF6B4A] border-2 border-[#18181B] dark:border-[#3F3F4A] flex items-center justify-center text-white shadow-retro-sm">
               <Plus className="w-4 h-4" />
             </div>
             <div>
-              <DialogTitle className="text-lg">Create New Task</DialogTitle>
+              <DialogTitle className="text-lg">{t.tasks.createTask}</DialogTitle>
               <DialogDescription>
-                Quickly add a task to your project workflow.
+                {t.tasks.quickCreate}
               </DialogDescription>
             </div>
           </div>
@@ -129,9 +131,9 @@ export function QuickCreateTaskModal({
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#18181B]">Task Title *</label>
+            <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.tasks.taskTitle} *</label>
             <Input
-              placeholder="e.g., Redesign landing page navigation"
+              placeholder={t.tasks.taskTitlePlaceholder}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -141,9 +143,9 @@ export function QuickCreateTaskModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-bold text-[#18181B]">Project</label>
+              <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.common.select} {t.projects.projectName}</label>
               <select
-                className="flex h-10 w-full rounded-lg border-2 border-[#18181B] bg-white px-3 py-2 text-xs font-semibold text-[#18181B] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
+                className="flex h-10 w-full rounded-lg border-2 border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#15151A] px-3 py-2 text-xs font-semibold text-[#18181B] dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
                 value={projectId}
                 onChange={(e) => {
                   setProjectId(e.target.value);
@@ -162,9 +164,9 @@ export function QuickCreateTaskModal({
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-[#18181B]">Column / State</label>
+              <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.tasks.selectColumn}</label>
               <select
-                className="flex h-10 w-full rounded-lg border-2 border-[#18181B] bg-white px-3 py-2 text-xs font-semibold text-[#18181B] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
+                className="flex h-10 w-full rounded-lg border-2 border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#15151A] px-3 py-2 text-xs font-semibold text-[#18181B] dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
                 value={columnId}
                 onChange={(e) => setColumnId(e.target.value)}
               >
@@ -179,22 +181,22 @@ export function QuickCreateTaskModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-xs font-bold text-[#18181B]">Priority</label>
+              <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.common.priority}</label>
               <select
-                className="flex h-10 w-full rounded-lg border-2 border-[#18181B] bg-white px-3 py-2 text-xs font-semibold text-[#18181B] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
+                className="flex h-10 w-full rounded-lg border-2 border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#15151A] px-3 py-2 text-xs font-semibold text-[#18181B] dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as TaskPriority)}
               >
-                <option value="NONE">No Priority</option>
-                <option value="LOW">Low</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HIGH">High</option>
-                <option value="URGENT">Urgent</option>
+                <option value="NONE">{t.priorities.NONE}</option>
+                <option value="LOW">{t.priorities.LOW}</option>
+                <option value="MEDIUM">{t.priorities.MEDIUM}</option>
+                <option value="HIGH">{t.priorities.HIGH}</option>
+                <option value="URGENT">{t.priorities.URGENT}</option>
               </select>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-[#18181B]">Due Date</label>
+              <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.common.dueDate}</label>
               <Input
                 type="date"
                 value={dueDate}
@@ -205,9 +207,9 @@ export function QuickCreateTaskModal({
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#18181B]">Description (Optional)</label>
+            <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.common.description}</label>
             <Textarea
-              placeholder="Add markdown notes, context, or requirements..."
+              placeholder={t.tasks.descriptionPlaceholder}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="text-xs min-h-[70px]"
@@ -221,7 +223,7 @@ export function QuickCreateTaskModal({
               onClick={onClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {t.common.cancel}
             </Button>
             <Button
               type="submit"
@@ -229,7 +231,7 @@ export function QuickCreateTaskModal({
               disabled={isSubmitting || !title.trim()}
               className="font-bold"
             >
-              {isSubmitting ? "Creating..." : "Create Task"}
+              {isSubmitting ? t.common.loading : t.tasks.createTask}
             </Button>
           </DialogFooter>
         </form>

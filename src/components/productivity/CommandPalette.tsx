@@ -10,11 +10,10 @@ import {
   Bell,
   Settings,
   FolderPlus,
-  Sparkles,
-  Command,
   X,
 } from "lucide-react";
 import { globalSearchAction, SearchResults } from "@/server/actions/search";
+import { useTranslation } from "@/lib/i18n/context";
 
 interface CommandPaletteProps {
   workspaceSlug: string;
@@ -30,6 +29,7 @@ export function CommandPalette({
   onOpenQuickProject,
 }: CommandPaletteProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
@@ -88,15 +88,15 @@ export function CommandPalette({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#18181B]/50 backdrop-blur-xs flex items-start justify-center pt-20 p-4 animate-in fade-in-0">
-      <div className="w-full max-w-xl rounded-2xl border-2 border-[#18181B] bg-white shadow-retro-lg overflow-hidden flex flex-col max-h-[80vh]">
+    <div className="fixed inset-0 z-50 bg-[#18181B]/50 dark:bg-black/60 backdrop-blur-xs flex items-start justify-center pt-20 p-4 animate-in fade-in-0">
+      <div className="w-full max-w-xl rounded-2xl border-2 border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#18181D] shadow-retro-lg overflow-hidden flex flex-col max-h-[80vh]">
         {/* Search Input */}
-        <div className="flex items-center px-4 py-3.5 border-b-2 border-[#18181B] bg-[#FDFBF7]">
-          <Search className="w-5 h-5 text-[#71717A] mr-3 shrink-0" />
+        <div className="flex items-center px-4 py-3.5 border-b-2 border-[#18181B] dark:border-[#3F3F4A] bg-[#FDFBF7] dark:bg-[#121216]">
+          <Search className="w-5 h-5 text-[#71717A] dark:text-[#A1A1AA] mr-3 shrink-0" />
           <input
             type="text"
-            className="w-full bg-transparent text-sm font-semibold text-[#18181B] placeholder:text-[#A1A1AA] focus:outline-none"
-            placeholder="Type a command or search tasks, projects, boards..."
+            className="w-full bg-transparent text-sm font-semibold text-[#18181B] dark:text-[#F4F4F5] placeholder:text-[#A1A1AA] dark:placeholder:text-[#71717A] focus:outline-none"
+            placeholder={t.commandPalette.placeholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoFocus
@@ -104,12 +104,12 @@ export function CommandPalette({
           {query && (
             <button
               onClick={() => setQuery("")}
-              className="text-xs text-[#71717A] hover:text-[#18181B] p-1"
+              className="text-xs text-[#71717A] dark:text-[#A1A1AA] hover:text-[#18181B] dark:hover:text-[#F4F4F5] p-1"
             >
               <X className="w-4 h-4" />
             </button>
           )}
-          <kbd className="hidden sm:inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded bg-[#F5F2EB] border border-[#18181B] text-[10px] font-bold text-[#71717A]">
+          <kbd className="hidden sm:inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded bg-[#F5F2EB] dark:bg-[#202029] border border-[#18181B] dark:border-[#3F3F4A] text-[10px] font-bold text-[#71717A] dark:text-[#A1A1AA]">
             ESC
           </kbd>
         </div>
@@ -121,8 +121,8 @@ export function CommandPalette({
             <div className="space-y-3">
               {searchResults.tasks.length > 0 && (
                 <div>
-                  <div className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider px-2 mb-1">
-                    Tasks
+                  <div className="text-[10px] font-bold text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider px-2 mb-1">
+                    {t.commandPalette.tasks}
                   </div>
                   <div className="space-y-1">
                     {searchResults.tasks.map((task) => (
@@ -131,10 +131,10 @@ export function CommandPalette({
                         onClick={() =>
                           navigate(`/app/${workspaceSlug}/projects/${task.projectSlug}/board?taskId=${task.id}`)
                         }
-                        className="w-full text-left flex items-center justify-between p-2 rounded-lg hover:bg-[#F5F2EB] border border-transparent hover:border-[#18181B] transition-all text-xs font-semibold text-[#18181B]"
+                        className="w-full text-left flex items-center justify-between p-2 rounded-lg hover:bg-[#F5F2EB] dark:hover:bg-[#202029] border border-transparent hover:border-[#18181B] dark:hover:border-[#3F3F4A] transition-all text-xs font-semibold text-[#18181B] dark:text-[#F4F4F5]"
                       >
                         <span className="truncate">{task.title}</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#E0D8FF] border border-[#18181B]">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#E0D8FF] dark:bg-[#2D2350] border border-[#18181B] dark:border-[#3F3F4A] text-[#18181B] dark:text-[#C4B5FD]">
                           {task.priority}
                         </span>
                       </button>
@@ -145,24 +145,24 @@ export function CommandPalette({
 
               {searchResults.projects.length > 0 && (
                 <div>
-                  <div className="text-[10px] font-bold text-[#71717A] uppercase tracking-wider px-2 mb-1">
-                    Projects
+                  <div className="text-[10px] font-bold text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider px-2 mb-1">
+                    {t.commandPalette.projects}
                   </div>
                   <div className="space-y-1">
                     {searchResults.projects.map((proj) => (
                       <button
                         key={proj.id}
                         onClick={() => navigate(`/app/${workspaceSlug}/projects/${proj.slug}/board`)}
-                        className="w-full text-left flex items-center justify-between p-2 rounded-lg hover:bg-[#F5F2EB] border border-transparent hover:border-[#18181B] transition-all text-xs font-semibold text-[#18181B]"
+                        className="w-full text-left flex items-center justify-between p-2 rounded-lg hover:bg-[#F5F2EB] dark:hover:bg-[#202029] border border-transparent hover:border-[#18181B] dark:hover:border-[#3F3F4A] transition-all text-xs font-semibold text-[#18181B] dark:text-[#F4F4F5]"
                       >
                         <span className="flex items-center gap-2">
                           <span
-                            className="w-2.5 h-2.5 rounded-full border border-[#18181B]"
+                            className="w-2.5 h-2.5 rounded-full border border-[#18181B] dark:border-[#3F3F4A]"
                             style={{ backgroundColor: proj.accentColor }}
                           />
                           {proj.name}
                         </span>
-                        <span className="text-[10px] text-[#71717A]">{proj.status}</span>
+                        <span className="text-[10px] text-[#71717A] dark:text-[#A1A1AA]">{proj.status}</span>
                       </button>
                     ))}
                   </div>
@@ -172,8 +172,8 @@ export function CommandPalette({
               {!isSearching &&
                 searchResults.tasks.length === 0 &&
                 searchResults.projects.length === 0 && (
-                  <div className="p-6 text-center text-xs text-[#71717A] font-medium">
-                    No results found for &ldquo;{query}&rdquo;.
+                  <div className="p-6 text-center text-xs text-[#71717A] dark:text-[#A1A1AA] font-medium">
+                    {t.commandPalette.noResults}
                   </div>
                 )}
             </div>
@@ -183,8 +183,8 @@ export function CommandPalette({
           {!query.trim() && (
             <div className="space-y-4">
               <div>
-                <div className="text-[10px] font-black text-[#71717A] uppercase tracking-wider px-2 mb-1.5">
-                  Quick Actions
+                <div className="text-[10px] font-black text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider px-2 mb-1.5">
+                  {t.commandPalette.actions}
                 </div>
                 <div className="space-y-1">
                   <button
@@ -192,13 +192,13 @@ export function CommandPalette({
                       setIsOpen(false);
                       onOpenQuickTask?.();
                     }}
-                    className="w-full text-left flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#FEF08A] border border-transparent hover:border-[#18181B] transition-all text-xs font-bold text-[#18181B]"
+                    className="w-full text-left flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#FEF08A] dark:hover:bg-[#3D3512] border border-transparent hover:border-[#18181B] dark:hover:border-[#3F3F4A] transition-all text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]"
                   >
                     <div className="w-6 h-6 rounded bg-[#FF6B4A] border border-[#18181B] flex items-center justify-center text-white">
                       <Plus className="w-3.5 h-3.5" />
                     </div>
-                    <span>Create New Task</span>
-                    <kbd className="ml-auto text-[10px] font-bold text-[#71717A]">C</kbd>
+                    <span>{t.commandPalette.createTask}</span>
+                    <kbd className="ml-auto text-[10px] font-bold text-[#71717A] dark:text-[#A1A1AA]">C</kbd>
                   </button>
 
                   <button
@@ -206,52 +206,52 @@ export function CommandPalette({
                       setIsOpen(false);
                       onOpenQuickProject?.();
                     }}
-                    className="w-full text-left flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#E0D8FF] border border-transparent hover:border-[#18181B] transition-all text-xs font-bold text-[#18181B]"
+                    className="w-full text-left flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#E0D8FF] dark:hover:bg-[#2D2350] border border-transparent hover:border-[#18181B] dark:hover:border-[#3F3F4A] transition-all text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]"
                   >
-                    <div className="w-6 h-6 rounded bg-[#E0D8FF] border border-[#18181B] flex items-center justify-center text-[#18181B]">
+                    <div className="w-6 h-6 rounded bg-[#E0D8FF] dark:bg-[#2D2350] border border-[#18181B] flex items-center justify-center text-[#18181B] dark:text-[#C4B5FD]">
                       <FolderPlus className="w-3.5 h-3.5" />
                     </div>
-                    <span>Create New Project</span>
-                    <kbd className="ml-auto text-[10px] font-bold text-[#71717A]">P</kbd>
+                    <span>{t.commandPalette.createProject}</span>
+                    <kbd className="ml-auto text-[10px] font-bold text-[#71717A] dark:text-[#A1A1AA]">P</kbd>
                   </button>
                 </div>
               </div>
 
               <div>
-                <div className="text-[10px] font-black text-[#71717A] uppercase tracking-wider px-2 mb-1.5">
-                  Navigation
+                <div className="text-[10px] font-black text-[#71717A] dark:text-[#A1A1AA] uppercase tracking-wider px-2 mb-1.5">
+                  {t.commandPalette.navigation}
                 </div>
                 <div className="space-y-1">
                   <button
                     onClick={() => navigate(`/app/${workspaceSlug}/dashboard`)}
-                    className="w-full text-left flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#F5F2EB] border border-transparent hover:border-[#18181B] transition-all text-xs font-semibold text-[#18181B]"
+                    className="w-full text-left flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#F5F2EB] dark:hover:bg-[#202029] border border-transparent hover:border-[#18181B] dark:hover:border-[#3F3F4A] transition-all text-xs font-semibold text-[#18181B] dark:text-[#F4F4F5]"
                   >
-                    <LayoutDashboard className="w-4 h-4 text-[#71717A]" />
-                    <span>Workspace Dashboard</span>
+                    <LayoutDashboard className="w-4 h-4 text-[#71717A] dark:text-[#A1A1AA]" />
+                    <span>{t.nav.dashboard}</span>
                   </button>
 
                   <button
                     onClick={() => navigate(`/app/${workspaceSlug}/my-tasks`)}
-                    className="w-full text-left flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#F5F2EB] border border-transparent hover:border-[#18181B] transition-all text-xs font-semibold text-[#18181B]"
+                    className="w-full text-left flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#F5F2EB] dark:hover:bg-[#202029] border border-transparent hover:border-[#18181B] dark:hover:border-[#3F3F4A] transition-all text-xs font-semibold text-[#18181B] dark:text-[#F4F4F5]"
                   >
-                    <CheckSquare className="w-4 h-4 text-[#71717A]" />
-                    <span>My Tasks Triage</span>
+                    <CheckSquare className="w-4 h-4 text-[#71717A] dark:text-[#A1A1AA]" />
+                    <span>{t.nav.myTasks}</span>
                   </button>
 
                   <button
                     onClick={() => navigate(`/app/${workspaceSlug}/notifications`)}
-                    className="w-full text-left flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#F5F2EB] border border-transparent hover:border-[#18181B] transition-all text-xs font-semibold text-[#18181B]"
+                    className="w-full text-left flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#F5F2EB] dark:hover:bg-[#202029] border border-transparent hover:border-[#18181B] dark:hover:border-[#3F3F4A] transition-all text-xs font-semibold text-[#18181B] dark:text-[#F4F4F5]"
                   >
-                    <Bell className="w-4 h-4 text-[#71717A]" />
-                    <span>Notification Center</span>
+                    <Bell className="w-4 h-4 text-[#71717A] dark:text-[#A1A1AA]" />
+                    <span>{t.nav.notifications}</span>
                   </button>
 
                   <button
                     onClick={() => navigate(`/app/${workspaceSlug}/settings`)}
-                    className="w-full text-left flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#F5F2EB] border border-transparent hover:border-[#18181B] transition-all text-xs font-semibold text-[#18181B]"
+                    className="w-full text-left flex items-center gap-2.5 p-2 rounded-lg hover:bg-[#F5F2EB] dark:hover:bg-[#202029] border border-transparent hover:border-[#18181B] dark:hover:border-[#3F3F4A] transition-all text-xs font-semibold text-[#18181B] dark:text-[#F4F4F5]"
                   >
-                    <Settings className="w-4 h-4 text-[#71717A]" />
-                    <span>Workspace Settings</span>
+                    <Settings className="w-4 h-4 text-[#71717A] dark:text-[#A1A1AA]" />
+                    <span>{t.workspaces.settingsTitle}</span>
                   </button>
                 </div>
               </div>
@@ -260,13 +260,13 @@ export function CommandPalette({
         </div>
 
         {/* Footer info */}
-        <div className="px-4 py-2 border-t border-[#E4E4E7] bg-[#FDFBF7] flex items-center justify-between text-[11px] text-[#71717A] font-medium">
+        <div className="px-4 py-2 border-t border-[#E4E4E7] dark:border-[#2E2E38] bg-[#FDFBF7] dark:bg-[#121216] flex items-center justify-between text-[11px] text-[#71717A] dark:text-[#A1A1AA] font-medium">
           <div className="flex items-center gap-2">
-            <span>Navigation:</span>
-            <kbd className="px-1.5 py-0.5 rounded bg-white border border-[#18181B] text-[9px] font-bold">↑↓</kbd>
-            <kbd className="px-1.5 py-0.5 rounded bg-white border border-[#18181B] text-[9px] font-bold">↵</kbd>
+            <span>{t.commandPalette.navigation}:</span>
+            <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-[#202029] border border-[#18181B] dark:border-[#3F3F4A] text-[9px] font-bold">↑↓</kbd>
+            <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-[#202029] border border-[#18181B] dark:border-[#3F3F4A] text-[9px] font-bold">↵</kbd>
           </div>
-          <div>Dayavi Command Palette</div>
+          <div>Dayavi ({t.brand.name})</div>
         </div>
       </div>
     </div>

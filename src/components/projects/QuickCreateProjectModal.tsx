@@ -16,6 +16,7 @@ import { createProjectAction } from "@/server/actions/project";
 import { toast } from "sonner";
 import { FolderPlus } from "lucide-react";
 import { ProjectStatus } from "@prisma/client";
+import { useTranslation } from "@/lib/i18n/context";
 
 interface QuickCreateProjectModalProps {
   isOpen: boolean;
@@ -40,6 +41,7 @@ export function QuickCreateProjectModal({
   workspaceSlug,
 }: QuickCreateProjectModalProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
@@ -68,8 +70,8 @@ export function QuickCreateProjectModal({
         name: name.trim(),
         slug: slug.trim(),
         description: description.trim() || undefined,
-        status,
         accentColor,
+        status,
       });
 
       if (res.success && res.project) {
@@ -79,28 +81,29 @@ export function QuickCreateProjectModal({
         setDescription("");
         onClose();
         router.push(`/app/${workspaceSlug}/projects/${res.project.slug}/board`);
+        router.refresh();
       } else {
-        toast.error(res.error || "Failed to create project.");
+        toast.error(res.error || "Failed to create project");
       }
-    } catch (err) {
-      toast.error("An error occurred while creating project.");
+    } catch (err: any) {
+      toast.error(err.message || "An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-lg">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#E0D8FF] border-2 border-[#18181B] flex items-center justify-center text-[#18181B] font-bold">
+            <div className="w-8 h-8 rounded-lg bg-[#E0D8FF] dark:bg-[#2D2350] border-2 border-[#18181B] dark:border-[#3F3F4A] flex items-center justify-center text-[#18181B] dark:text-[#C4B5FD] shadow-retro-sm">
               <FolderPlus className="w-4 h-4" />
             </div>
             <div>
-              <DialogTitle className="text-lg">Create New Project</DialogTitle>
+              <DialogTitle className="text-lg">{t.projects.createProject}</DialogTitle>
               <DialogDescription>
-                Initiate a project pipeline with automated Kanban workflow.
+                {t.projects.newProject}
               </DialogDescription>
             </div>
           </div>
@@ -108,9 +111,9 @@ export function QuickCreateProjectModal({
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#18181B]">Project Name *</label>
+            <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.projects.projectName} *</label>
             <Input
-              placeholder="e.g. Design System v2"
+              placeholder={t.projects.projectNamePlaceholder}
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
               required
@@ -119,56 +122,47 @@ export function QuickCreateProjectModal({
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#18181B]">URL Slug *</label>
-            <Input
-              placeholder="design-system-v2"
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-[#18181B]">Status</label>
-              <select
-                className="flex h-10 w-full rounded-lg border-2 border-[#18181B] bg-white px-3 py-2 text-xs font-semibold text-[#18181B] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
-                value={status}
-                onChange={(e) => setStatus(e.target.value as ProjectStatus)}
-              >
-                <option value="PLANNING">Planning</option>
-                <option value="ACTIVE">Active</option>
-                <option value="ON_HOLD">On Hold</option>
-                <option value="COMPLETED">Completed</option>
-              </select>
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-[#18181B]">Accent Color</label>
-              <div className="flex items-center gap-2 h-10">
-                {ACCENT_COLORS.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setAccentColor(c)}
-                    className={`w-6 h-6 rounded-full border-2 border-[#18181B] transition-transform ${
-                      accentColor === c ? "scale-125 shadow-retro-sm" : "opacity-70 hover:opacity-100"
-                    }`}
-                    style={{ backgroundColor: c }}
-                  />
-                ))}
-              </div>
+            <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.projects.projectSlug} *</label>
+            <div className="flex items-center">
+              <span className="px-2.5 py-2 rounded-l-lg border-2 border-r-0 border-[#18181B] dark:border-[#3F3F4A] bg-[#F5F2EB] dark:bg-[#202029] text-xs font-bold text-[#71717A] dark:text-[#A1A1AA]">
+                /projects/
+              </span>
+              <input
+                type="text"
+                className="flex h-10 w-full rounded-r-lg border-2 border-[#18181B] dark:border-[#3F3F4A] bg-white dark:bg-[#15151A] px-3 py-2 text-xs font-semibold text-[#18181B] dark:text-[#F4F4F5] focus:outline-none focus:ring-2 focus:ring-[#FF6B4A]"
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
+                required
+              />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-[#18181B]">Description</label>
+            <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.projects.projectDescription}</label>
             <Textarea
-              placeholder="Brief description of the project goals..."
+              placeholder={t.projects.projectDescriptionPlaceholder}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="text-xs min-h-[60px]"
             />
+          </div>
+
+          {/* Accent Color Selection */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-[#18181B] dark:text-[#F4F4F5]">{t.projects.accentColor}</label>
+            <div className="flex items-center gap-2">
+              {ACCENT_COLORS.map((col) => (
+                <button
+                  key={col}
+                  type="button"
+                  onClick={() => setAccentColor(col)}
+                  className={`w-7 h-7 rounded-lg border-2 border-[#18181B] dark:border-[#3F3F4A] transition-transform ${
+                    accentColor === col ? "scale-110 shadow-retro-sm" : "opacity-80 hover:opacity-100"
+                  }`}
+                  style={{ backgroundColor: col }}
+                />
+              ))}
+            </div>
           </div>
 
           <DialogFooter className="pt-2">
@@ -178,15 +172,15 @@ export function QuickCreateProjectModal({
               onClick={onClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {t.common.cancel}
             </Button>
             <Button
               type="submit"
               variant="primary"
-              disabled={isSubmitting || !name.trim()}
+              disabled={isSubmitting || !name.trim() || !slug.trim()}
               className="font-bold"
             >
-              {isSubmitting ? "Creating..." : "Create Project"}
+              {isSubmitting ? t.common.loading : t.projects.createProject}
             </Button>
           </DialogFooter>
         </form>
